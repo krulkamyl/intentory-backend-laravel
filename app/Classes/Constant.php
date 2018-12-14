@@ -11,6 +11,8 @@ namespace App\Classes;
 
 class Constant
 {
+    const DATEFORMAT = 'Y-m-d\TH:i:sO';
+
     const TABLE_USERS = 'users';
     const TABLE_CUSTOMERS = 'customers';
     const TABLE_PARAMETERS = 'parameters';

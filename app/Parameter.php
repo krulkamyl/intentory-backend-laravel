@@ -40,7 +40,7 @@ class Parameter extends Model
      *
      * @var string
      */
-    protected $dateFormat = 'Y-m-d\TH:i:sO';
+    protected $dateFormat = Constant::DATEFORMAT;
 
     /**
      * The attributes that are mass assignable.
@@ -50,4 +50,19 @@ class Parameter extends Model
     protected $fillable = [
         'name'
     ];
+
+    /**
+     * Converting model to array
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans()
+        ];
+    }
 }

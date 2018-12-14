@@ -15,6 +15,7 @@ class CreateProductHasParamsTable extends Migration
     public function up()
     {
         Schema::create(Constant::TABLE_PRODUCTHASPARAMS, function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('id_product')->unsigned();
             $table->integer('id_param')->unsigned();
             $table->string('value');

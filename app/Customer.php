@@ -41,7 +41,7 @@ class Customer extends Model
      *
      * @var string
      */
-    protected $dateFormat = 'Y-m-d\TH:i:sO';
+    protected $dateFormat = Constant::DATEFORMAT;
 
     /**
      * The attributes that are mass assignable.
@@ -49,7 +49,10 @@ class Customer extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'id',
+        'name',
+        'created_at',
+        'updated_at'
     ];
 
 
@@ -61,7 +64,10 @@ class Customer extends Model
     public function toArray()
     {
         return [
-          'name' => $this->name
+            'id' => $this->id,
+            'name' => $this->name,
+            'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans()
         ];
     }
 

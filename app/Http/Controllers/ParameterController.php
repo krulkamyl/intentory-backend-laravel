@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 
 use App\Parameter;
 use Illuminate\Http\Request;
@@ -11,6 +9,10 @@ class ParameterController extends Controller
 {
     public function index() {
         return response(Parameter::all()->toArray(),200);
+    }
+
+    public function parameter($id) {
+        return ($parameter = Parameter::find($id)) ? $parameter->toArray() : response('not found',204);
     }
 
     public function store(Request $request) {

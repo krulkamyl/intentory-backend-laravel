@@ -13,6 +13,10 @@ class CustomerController extends Controller
         return response(Customer::all()->toArray(),200);
     }
 
+    public function customer($id) {
+        return ($customer = Customer::find($id)) ? $customer->toArray() : response('not found',204);
+    }
+
     public function store(Request $request) {
         $validator = $this->validator($request->all());
         if ($validator->fails())

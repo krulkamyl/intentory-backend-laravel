@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Classes\Constant;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -30,6 +31,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasRented whereIsRented($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasRented whereRentedTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasRented whereUpdatedAt($value)
+ * @property-read \App\Customer $customer
+ * @property-read \App\Product $product
  */
 class ProductHasRented extends Model
 {
@@ -44,12 +47,23 @@ class ProductHasRented extends Model
      * @var bool
      */
     public $timestamps = true;
+
     /**
      * The storage format of the model's date columns.
      *
      * @var string
      */
-    protected $dateFormat = 'Y-m-d\TH:i:sO';
+    protected $dateFormat = Constant::DATEFORMAT;
+
+    /**
+     * This attributes have dates
+     * @var array
+     */
+    protected $dates = [
+        'rented_time',
+        'created_at',
+        'updated_at'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -65,12 +79,13 @@ class ProductHasRented extends Model
         'is_denuncation'
     ];
 
+
     /**
      * Get customer.
      *
      */
     public function customer() {
-        $this->hasOne(Customer::class,'id','id_customer');
+        return $this->hasOne(Customer::class,'id','id_customer');
     }
 
     /**
@@ -78,7 +93,7 @@ class ProductHasRented extends Model
      *
      */
     public function product() {
-        $this->hasOne(Product::class,'id','id_product');
+        return $this->hasOne(Product::class,'id','id_product');
     }
 
     /**
@@ -89,15 +104,24 @@ class ProductHasRented extends Model
     public function toArray()
     {
         return [
+            'id' => $this->id,
             'product'=> $this->product->toArray(),
-            'customer' => $this->customer->name,
-            'rented_time' => $this->rented_time,
+            'customer' => $this->customer->toArray(),
+            'rented_time' => $this->rented_time->toDateString(),
             'duration_time' => $this->duration_time,
+            'rented_cost' => $this->product->price * $this->duration_time,
             'is_rented' => $this->is_rented,
-            'is_denuncation' => $this->is_denuncation
+            'is_denuncation' => $this->is_denuncation,
+            'duration_time_date' => $this->durationTimeDate()->toDateString(),
+            'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans()
         ];
     }
 
+    public function durationTimeDate() {
+        $immutable = Carbon::createFromTimeString($this->rented_time->toDateTimeString());
+        return $immutable->addDays($this->duration_time);
+    }
     /**
      * Converting model array to json
      *

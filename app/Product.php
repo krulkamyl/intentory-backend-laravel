@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Classes\Constant;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Product wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Product whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\ProductHasRented[] $rents
  */
 class Product extends Model
 {
@@ -44,7 +46,7 @@ class Product extends Model
      *
      * @var string
      */
-    protected $dateFormat = 'Y-m-d\TH:i:sO';
+    protected $dateFormat = Constant::DATEFORMAT;
 
     /**
      * The attributes that are mass assignable.
@@ -64,7 +66,8 @@ class Product extends Model
      * @param $id
      * @return Product|\Illuminate\Database\Eloquent\Builder|Model|object|null
      */
-    public static function findProduct($id) {
+    public static function findProduct($id)
+    {
         return Product::whereId($id)->whereIsDeleted(false)->first();
     }
 
@@ -75,7 +78,42 @@ class Product extends Model
      */
     public function parameters()
     {
-        return $this->hasMany(ProductHasParam::class,'id_param','id');
+        return $this->hasMany(ProductHasParam::class, 'id_product', 'id');
+    }
+
+    /**
+     * Get all rents in this product.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function rents()
+    {
+        return $this->hasMany(ProductHasRented::class, 'id_product', 'id');
+    }
+
+    public function inLeasing() {
+        /** @var ProductHasRented $rent */
+        foreach ($this->rents as $rent) {
+            if (!$rent->is_denuncation)
+                if (Carbon::now()->between(Carbon::parse($rent->rented_time), Carbon::parse($rent->durationTimeDate())))
+                    return true;
+                else continue;
+        }
+        return false;
+    }
+
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'price' => $this->price,
+            'in_leasing' => $this->inLeasing(),
+            'have_history' => ($this->rents->count() >= 1) ? true : false,
+            'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans(),
+            'parameters' => $this->parameters->toArray()
+        ];
     }
 
 

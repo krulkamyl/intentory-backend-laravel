@@ -22,6 +22,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasParam whereIdProduct($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasParam whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasParam whereValue($value)
+ * @property int $id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\ProductHasParam whereId($value)
+ * @property-read \App\Parameter $param
+ * @property-read \App\Product $product
  */
 class ProductHasParam extends Model
 {
@@ -47,7 +51,7 @@ class ProductHasParam extends Model
      *
      * @var string
      */
-    protected $dateFormat = 'Y-m-d\TH:i:sO';
+    protected $dateFormat = Constant::DATEFORMAT;
 
     /**
      * The attributes that are mass assignable.
@@ -65,14 +69,14 @@ class ProductHasParam extends Model
      * Get param
      */
     public function param() {
-        $this->hasOne(Parameter::class,'id','id_param');
+        return $this->hasOne(Parameter::class,'id','id_param');
     }
 
     /**
      * Get product
      */
     public function product() {
-        $this->hasOne(Product::class,'id','id_product');
+        return $this->hasOne(Product::class,'id','id_product');
     }
 
     /**
